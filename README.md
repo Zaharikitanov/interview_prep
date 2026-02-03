@@ -8,51 +8,48 @@
 
 **React**
 
-- [Redux vs React Query](#2-redux-vs-react-query)
-- [React Hooks - useMemo vs useCallback](#7-react-hooks)
-- [useEffect Cleanup](#8-react-useeffect-cleanup)
-- [Key Prop in Lists](#16-react-key-prop)
-- [Context API vs Prop Drilling](#18-react-context-api)
-- [Performance Optimization](#20-react-performance-optimization)
+- [Redux vs React Query](#redux-vs-react-query)
+- [React Hooks - useMemo vs useCallback](#react-hooks)
+- [useEffect Cleanup](#react-useeffect-cleanup)
+- [Key Prop in Lists](#react-key-prop)
+- [Context API vs Prop Drilling](#react-context-api)
+- [Performance Optimization](#react-performance-optimization)
 
 **Node.js & JavaScript**
 
-- [Event Loop](#3-nodejs-event-loop)
-- [Promises & Microtasks](#4-promises--timeout)
-- [Closures](#17-javascript-closures)
+- [Event Loop](#nodejs-event-loop)
+- [Promises & Microtasks](#promises--timeout)
+- [Closures](#javascript-closures)
 
 **NestJS**
 
-- [Decorator Execution Order](#1-q-in-what-order-are-decorators-executed-in-nestjs-controllers)
-- [Guards & Pipes](#53-nestjs-guards--pipes--error-handling)
-- [NestJS vs Next.js Backend](#54-nestjs-vs-nextjs-backend)
+- [Decorator Execution Order](#nestjs-decorator-execution-order)
+- [Guards & Pipes](#nestjs-guards--pipes--error-handling)
+- [NestJS vs Next.js Backend](#nestjs-vs-nextjs-backend)
 
 **Database (PostgreSQL)**
 
-- [Indexes](#9-postgresql-indexes)
-- [Transactions & ACID](#10-database-transactions)
-- [N+1 Query Problem](#11-n1-query-problem)
-- [SQL Injection Prevention](#15-sql-injection-prevention)
-- [Normalization](#19-database-normalization)
+- [Indexes](#postgresql-indexes)
+- [Transactions & ACID](#database-transactions)
+- [N+1 Query Problem](#n1-query-problem)
+- [SQL Injection Prevention](#sql-injection-prevention)
+- [Normalization](#database-normalization)
 
 **Authentication & Security**
 
-- [Next.js Authentication](#51-nextjs-authentication)
-- [OAuth2](#52-oauth2)
-- [JWT vs Session Authentication](#14-jwt-vs-session-authentication)
-- [CORS](#13-cors)
-
-**API Design**
-
-- [REST vs GraphQL](#12-rest-vs-graphql)
+- [Next.js Authentication](#nextjs-authentication)
+- [OAuth2](#oauth2)
+- [JWT vs Session Authentication](#jwt-vs-session-authentication)
 
 **TypeScript**
 
-- [Extending Interfaces](#61-extending-interfaces)
+- [Extending Interfaces](#typescript-extending-interfaces)
 
 ---
 
-## 1. **Q:** In what order are decorators executed in NestJS controllers?
+## NestJS Decorator Execution Order
+
+**Q:** In what order are decorators executed in NestJS controllers?
 
 **A:**  
 For an incoming HTTP request, the execution order is:
@@ -75,6 +72,8 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Pipes run **right before** the controller method
 - Interceptors wrap the execution (before & after)
 - Exception filters catch errors thrown anywhere below them
+
+[↑ Back to Appendix](#appendix)
 
 ---
 
@@ -130,7 +129,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 ---
 
-## 4. Promises / Timeout
+## Promises / Timeout
 
 **Q:** What problem do promises solve?
 
@@ -148,11 +147,13 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 - Promise.then (microtask)
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 5. Next.js vs NestJS + Authentication
+## Next.js vs NestJS + Authentication
 
-### 5.1 Next.js Authentication
+### Next.js Authentication
 
 **Q:** Did you implement authentication in Next.js? How?
 
@@ -162,9 +163,11 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - OAuth2 providers (Google, GitHub, etc.)
 - JWT-based or session-based authentication
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-### 5.2 OAuth2
+### OAuth2
 
 **Q:** What is OAuth2?
 
@@ -177,11 +180,13 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 **Red flags:**
 
-- “OAuth is login”
+- "OAuth is login"
+
+[↑ Back to Appendix](#appendix)
 
 ---
 
-### 5.3 NestJS Guards / Pipes / Error handling
+### NestJS Guards / Pipes / Error handling
 
 **Q:** What are Guards and Pipes in NestJS?
 
@@ -204,9 +209,11 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Global exception filters
 - Centralized error handling
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-### 5.4 NestJS vs Next.js backend
+### NestJS vs Next.js backend
 
 **Q:** Why choose NestJS over Next.js API routes?
 
@@ -217,11 +224,13 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Better scalability
 - More suitable for large backends
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 6. TypeScript
+## TypeScript
 
-### 6.1 Extending interfaces
+### TypeScript Extending Interfaces
 
 **Q:** How do you extend interfaces in TypeScript?
 
@@ -237,9 +246,11 @@ interface Admin extends User {
 }
 ```
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 7. React Hooks
+## React Hooks
 
 **Q:** What's the difference between useMemo and useCallback?
 
@@ -262,9 +273,11 @@ const handleClick = useCallback(() => doSomething(id), [id]);
 - Using them everywhere unnecessarily
 - Not understanding dependencies array
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 8. React useEffect Cleanup
+## React useEffect Cleanup
 
 **Q:** Why do we need cleanup functions in useEffect?
 
@@ -288,9 +301,11 @@ useEffect(() => {
 - Not cleaning up event listeners
 - Not canceling API requests
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 9. PostgreSQL Indexes
+## PostgreSQL Indexes
 
 **Q:** What are database indexes and when should you use them?
 
@@ -317,9 +332,11 @@ CREATE INDEX idx_user_email ON users(email);
 - Not understanding the write trade-off
 - Indexing everything
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 10. Database Transactions
+## Database Transactions
 
 **Q:** What are database transactions and why are they important?
 
@@ -343,9 +360,11 @@ await db.transaction(async (trx) => {
 - Not using transactions for related operations
 - Can't explain ACID
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 11. N+1 Query Problem
+## N+1 Query Problem
 
 **Q:** What is the N+1 query problem?
 
@@ -372,63 +391,11 @@ const users = await User.findAll({
 });
 ```
 
----
-
-## 12. REST vs GraphQL
-
-**Q:** When would you choose GraphQL over REST?
-
-**A:**
-
-**GraphQL:**
-
-- Single endpoint
-- Client specifies exact data needed
-- Avoids over-fetching / under-fetching
-- Better for complex, nested data
-
-**REST:**
-
-- Multiple endpoints
-- Simpler to implement
-- Better caching (HTTP caching)
-- Easier to understand for small APIs
-
-**Red flags:**
-
-- "GraphQL is always better"
-- Can't explain trade-offs
+[↑ Back to Appendix](#appendix)
 
 ---
 
-## 13. CORS
-
-**Q:** What is CORS and why does it exist?
-
-**A:**
-
-- Cross-Origin Resource Sharing
-- Security mechanism in browsers
-- Prevents unauthorized cross-origin requests
-- Server must explicitly allow origins
-
-**In NestJS:**
-
-```ts
-app.enableCors({
-  origin: "https://example.com",
-  credentials: true,
-});
-```
-
-**Red flags:**
-
-- Setting origin: '\*' in production
-- Not understanding why it exists
-
----
-
-## 14. JWT vs Session Authentication
+## JWT vs Session Authentication
 
 **Q:** What's the difference between JWT and session-based auth?
 
@@ -453,9 +420,11 @@ app.enableCors({
 - "JWT is always better"
 - Storing sensitive data in JWT
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 15. SQL Injection Prevention
+## SQL Injection Prevention
 
 **Q:** How do you prevent SQL injection?
 
@@ -483,9 +452,11 @@ await db.query(query, [userId]);
 - Not knowing what SQL injection is
 - String concatenation in queries
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 16. React Key Prop
+## React Key Prop
 
 **Q:** Why does React need the key prop in lists?
 
@@ -509,9 +480,11 @@ await db.query(query, [userId]);
 - Using index as key always
 - Not understanding reconciliation
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 17. JavaScript Closures
+## JavaScript Closures
 
 **Q:** What is a closure?
 
@@ -538,9 +511,11 @@ function createCounter() {
 - Can't explain in simple terms
 - Not understanding scope chain
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 18. React Context API
+## React Context API
 
 **Q:** When would you use Context API vs prop drilling?
 
@@ -562,9 +537,11 @@ function createCounter() {
 - Using Context for everything
 - "Context replaces Redux"
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 19. Database Normalization
+## Database Normalization
 
 **Q:** What is database normalization?
 
@@ -587,9 +564,11 @@ function createCounter() {
 - Over-normalizing (too many JOINs)
 - Not understanding when to denormalize
 
+[↑ Back to Appendix](#appendix)
+
 ---
 
-## 20. React Performance Optimization
+## React Performance Optimization
 
 **Q:** How would you optimize a slow React component?
 
@@ -606,3 +585,5 @@ function createCounter() {
 
 - Premature optimization
 - Not measuring before optimizing
+
+[↑ Back to Appendix](#appendix)

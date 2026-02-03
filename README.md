@@ -4,33 +4,51 @@
 
 ## Appendix
 
-### Quick Reference: All Questions
+### Quick Reference by Topic
 
-1. [In what order are decorators executed in NestJS controllers?](#1-q-in-what-order-are-decorators-executed-in-nestjs-controllers)
-2. [When would you use Redux and when React Query?](#2-redux-vs-react-query)
-3. [Explain the Node.js event loop in simple terms](#3-nodejs-event-loop)
-4. [What problem do promises solve?](#4-promises--timeout)
-5. [Authentication & OAuth2](#5-nextjs-vs-nestjs--authentication)
-   - [Did you implement authentication in Next.js? How?](#51-nextjs-authentication)
-   - [What is OAuth2?](#52-oauth2)
-   - [What are Guards and Pipes in NestJS?](#53-nestjs-guards--pipes--error-handling)
-   - [Why choose NestJS over Next.js API routes?](#54-nestjs-vs-nextjs-backend)
-6. [TypeScript](#6-typescript)
-   - [How do you extend interfaces in TypeScript?](#61-extending-interfaces)
-7. [What's the difference between useMemo and useCallback?](#7-react-hooks)
-8. [Why do we need cleanup functions in useEffect?](#8-react-useeffect-cleanup)
-9. [What are database indexes and when should you use them?](#9-postgresql-indexes)
-10. [What are database transactions and why are they important?](#10-database-transactions)
-11. [What is the N+1 query problem?](#11-n1-query-problem)
-12. [When would you choose GraphQL over REST?](#12-rest-vs-graphql)
-13. [What is CORS and why does it exist?](#13-cors)
-14. [What's the difference between JWT and session-based auth?](#14-jwt-vs-session-authentication)
-15. [How do you prevent SQL injection?](#15-sql-injection-prevention)
-16. [Why does React need the key prop in lists?](#16-react-key-prop)
-17. [What is a closure?](#17-javascript-closures)
-18. [When would you use Context API vs prop drilling?](#18-react-context-api)
-19. [What is database normalization?](#19-database-normalization)
-20. [How would you optimize a slow React component?](#20-react-performance-optimization)
+**React**
+
+- [Redux vs React Query](#2-redux-vs-react-query)
+- [React Hooks - useMemo vs useCallback](#7-react-hooks)
+- [useEffect Cleanup](#8-react-useeffect-cleanup)
+- [Key Prop in Lists](#16-react-key-prop)
+- [Context API vs Prop Drilling](#18-react-context-api)
+- [Performance Optimization](#20-react-performance-optimization)
+
+**Node.js & JavaScript**
+
+- [Event Loop](#3-nodejs-event-loop)
+- [Promises & Microtasks](#4-promises--timeout)
+- [Closures](#17-javascript-closures)
+
+**NestJS**
+
+- [Decorator Execution Order](#1-q-in-what-order-are-decorators-executed-in-nestjs-controllers)
+- [Guards & Pipes](#53-nestjs-guards--pipes--error-handling)
+- [NestJS vs Next.js Backend](#54-nestjs-vs-nextjs-backend)
+
+**Database (PostgreSQL)**
+
+- [Indexes](#9-postgresql-indexes)
+- [Transactions & ACID](#10-database-transactions)
+- [N+1 Query Problem](#11-n1-query-problem)
+- [SQL Injection Prevention](#15-sql-injection-prevention)
+- [Normalization](#19-database-normalization)
+
+**Authentication & Security**
+
+- [Next.js Authentication](#51-nextjs-authentication)
+- [OAuth2](#52-oauth2)
+- [JWT vs Session Authentication](#14-jwt-vs-session-authentication)
+- [CORS](#13-cors)
+
+**API Design**
+
+- [REST vs GraphQL](#12-rest-vs-graphql)
+
+**TypeScript**
+
+- [Extending Interfaces](#61-extending-interfaces)
 
 ---
 

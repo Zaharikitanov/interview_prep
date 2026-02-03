@@ -11,7 +11,6 @@
 - [Redux vs React Query](#redux-vs-react-query)
 - [React Hooks - useMemo vs useCallback](#react-hooks)
 - [useEffect Cleanup](#react-useeffect-cleanup)
-- [Key Prop in Lists](#react-key-prop)
 - [Context API vs Prop Drilling](#react-context-api)
 - [Performance Optimization](#react-performance-optimization)
 - [Controlled vs Uncontrolled Components](#controlled-vs-uncontrolled-components)
@@ -28,18 +27,15 @@
 
 - [Decorator Execution Order](#nestjs-decorator-execution-order)
 - [Guards & Pipes](#nestjs-guards--pipes--error-handling)
-- [NestJS vs Next.js Backend](#nestjs-vs-nextjs-backend)
 - [Modules and Providers](#nestjs-modules-and-providers)
 - [Dependency Injection](#nestjs-dependency-injection)
 
 **Database (PostgreSQL)**
 
 - [Indexes](#postgresql-indexes)
-- [Transactions & ACID](#database-transactions)
 - [N+1 Query Problem](#n1-query-problem)
 - [SQL Injection Prevention](#sql-injection-prevention)
 - [Normalization](#database-normalization)
-- [Connection Pooling](#database-connection-pooling)
 - [Migrations](#database-migrations)
 - [Composite Indexes](#composite-indexes)
 
@@ -48,15 +44,20 @@
 - [Next.js Authentication](#nextjs-authentication)
 - [OAuth2](#oauth2)
 - [JWT vs Session Authentication](#jwt-vs-session-authentication)
-- [Refresh Tokens](#refresh-tokens)
-- [Password Hashing](#password-hashing)
 
 **TypeScript**
 
 - [Extending Interfaces](#typescript-extending-interfaces)
 - [Generics](#typescript-generics)
 - [Union and Intersection Types](#typescript-union-and-intersection-types)
-- [Type Guards](#typescript-type-guards)
+
+**Behavioral & Soft Skills**
+
+- [Disagreement with Team Member](#disagreement-with-team-member)
+- [Learning from Mistakes](#learning-from-mistakes)
+- [Receiving Critical Feedback](#receiving-critical-feedback)
+- [Technical Decision Making](#technical-decision-making)
+- [Mentoring Others](#mentoring-others)
 
 ---
 
@@ -226,21 +227,6 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 ---
 
-### NestJS vs Next.js backend
-
-**Q:** Why choose NestJS over Next.js API routes?
-
-**A:**
-
-- Structured architecture
-- Built-in dependency injection
-- Better scalability
-- More suitable for large backends
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## TypeScript
 
 ### TypeScript Extending Interfaces
@@ -349,34 +335,6 @@ CREATE INDEX idx_user_email ON users(email);
 
 ---
 
-## Database Transactions
-
-**Q:** What are database transactions and why are they important?
-
-**A:**
-
-- Group multiple operations into one atomic unit
-- ACID properties: Atomicity, Consistency, Isolation, Durability
-- All succeed or all fail (rollback)
-
-**Example in Node.js:**
-
-```js
-await db.transaction(async (trx) => {
-  await trx("accounts").where({ id: 1 }).decrement("balance", 100);
-  await trx("accounts").where({ id: 2 }).increment("balance", 100);
-});
-```
-
-**Red flags:**
-
-- Not using transactions for related operations
-- Can't explain ACID
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## N+1 Query Problem
 
 **Q:** What is the N+1 query problem?
@@ -464,34 +422,6 @@ await db.query(query, [userId]);
 
 - Not knowing what SQL injection is
 - String concatenation in queries
-
-[↑ Back to Appendix](#appendix)
-
----
-
-## React Key Prop
-
-**Q:** Why does React need the key prop in lists?
-
-**A:**
-
-- Helps React identify which items changed
-- Optimizes re-rendering
-- Should be stable and unique
-- **Don't use array index** if list can reorder
-
-**Example:**
-
-```tsx
-{
-  users.map((user) => <UserCard key={user.id} user={user} />);
-}
-```
-
-**Red flags:**
-
-- Using index as key always
-- Not understanding reconciliation
 
 [↑ Back to Appendix](#appendix)
 
@@ -782,38 +712,6 @@ export class UserService {
 
 ---
 
-## Database Connection Pooling
-
-**Q:** What is connection pooling and why is it important?
-
-**A:**
-
-- Reuse database connections instead of creating new ones
-- Pool maintains a set of open connections
-- Reduces connection overhead and latency
-- Limits concurrent connections to database
-
-**Configuration:**
-
-```js
-const pool = new Pool({
-  max: 20, // max connections
-  min: 5, // min connections
-  idle: 10000, // idle timeout
-  acquire: 30000, // acquire timeout
-});
-```
-
-**Red flags:**
-
-- Creating new connection for every query
-- Not closing connections
-- Pool size too large or too small
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## Database Migrations
 
 **Q:** What are database migrations and why use them?
@@ -954,103 +852,211 @@ type AdminUser = User & Admin & { permissions: string[] };
 
 ---
 
-## TypeScript Type Guards
+## Behavioral & Soft Skills
 
-**Q:** What are type guards and how do you use them?
+### Disagreement with Team Member
 
-**A:**
+**Q:** Tell me about a time you had a disagreement with a team member or manager. How was it resolved?
 
-- Runtime checks that narrow types
-- Help TypeScript understand type at runtime
-- typeof, instanceof, custom type predicates
+**Framework:** Use STAR (Situation, Task, Action, Result)
 
-**Examples:**
+**Key Points to Cover:**
 
-```ts
-// typeof guard
-if (typeof value === "string") {
-  value.toUpperCase();
-}
+- Describe the disagreement objectively
+- Focus on the technical/logical reasoning, not emotions
+- Show you listened to the other perspective
+- Explain how you reached a resolution
+- Highlight positive outcome or learning
 
-// Custom type guard
-function isUser(obj: any): obj is User {
-  return "id" in obj && "email" in obj;
-}
+**Example Structure:**
 
-if (isUser(data)) {
-  console.log(data.email); // TypeScript knows it's User
-}
-```
+- **Situation:** Working on API design, disagreed on REST vs GraphQL
+- **Task:** Needed to choose an approach that worked for the team
+- **Action:** Scheduled meeting, presented pros/cons, created POC for both
+- **Result:** Agreed on hybrid approach, team satisfied, project succeeded
 
 **Red flags:**
 
-- Using 'any' and type assertions instead
-- Not narrowing union types properly
+- Blaming others or being defensive
+- Not acknowledging other viewpoints
+- Unresolved conflict or bad outcome
+- Personal attacks or emotional responses
 
 [↑ Back to Appendix](#appendix)
 
 ---
 
-## Refresh Tokens
+### Learning from Mistakes
 
-**Q:** What are refresh tokens and why use them?
+**Q:** Tell me about a time you made a mistake. What did you learn?
 
-**A:**
+**Key Points to Cover:**
 
-- Long-lived tokens to obtain new access tokens
-- Access tokens are short-lived (15 min)
-- Refresh tokens stored securely (httpOnly cookie)
-- Reduces re-authentication frequency
+- Own the mistake honestly
+- Explain the context (not as an excuse)
+- Describe immediate actions to fix it
+- What processes you changed to prevent it
+- Show growth and maturity
 
-**Flow:**
+**Example Structure:**
 
-1. Login → receive access token + refresh token
-2. Access token expires → use refresh token
-3. Get new access token + new refresh token
-4. Logout → invalidate refresh token
+- **Situation:** Deployed code to production without running full test suite
+- **Impact:** Bug affected 20% of users for 2 hours
+- **Action:**
+  - Immediately rolled back deployment
+  - Fixed bug and added missing tests
+  - Communicated with users about issue
+  - Created deployment checklist
+  - Set up automated pre-deploy test requirement
+- **Learning:** Importance of process over speed, better CI/CD setup
+
+**What interviewers want to see:**
+
+- Accountability (not blaming others/tools)
+- Problem-solving under pressure
+- Process improvement mindset
+- Emotional maturity
 
 **Red flags:**
 
-- Storing refresh tokens in localStorage
-- Not rotating refresh tokens
-- Same expiry for access and refresh tokens
+- No real mistake (humblebrag)
+- Blaming others
+- No learning or change in behavior
+- Repeating same type of mistakes
 
 [↑ Back to Appendix](#appendix)
 
 ---
 
-## Password Hashing
+### Receiving Critical Feedback
 
-**Q:** How should you hash passwords? What algorithm?
+**Q:** Tell me about a time you received critical feedback. How did you respond?
 
-**A:**
+**Key Points to Cover:**
 
-**Use:** bcrypt or Argon2 (modern choice)
+- Show you're receptive to feedback
+- Didn't take it personally
+- Asked clarifying questions
+- Made concrete changes
+- Followed up to show improvement
 
-**Never:** MD5, SHA-1, plain SHA-256
+**Example Structure:**
 
-**Why:**
+- **Situation:** Code review feedback that my PRs were too large/complex
+- **Initial Response:** Felt defensive but took time to reflect
+- **Action:**
+  - Asked reviewer for specific examples
+  - Reviewed my recent PRs objectively
+  - Started breaking work into smaller chunks
+  - Asked for feedback on new approach
+  - Shared learnings with junior devs
+- **Result:** PRs reviewed faster, fewer bugs, better collaboration
 
-- Designed to be slow (resist brute force)
-- Built-in salt generation
-- Adjustable work factor
+**Good approaches:**
 
-**Example (bcrypt):**
-
-```js
-const bcrypt = require("bcrypt");
-
-// Hash
-const hash = await bcrypt.hash(password, 10); // 10 rounds
-
-// Verify
-const isValid = await bcrypt.compare(password, hash);
-```
+- Thank the person for feedback
+- Ask questions to understand better
+- Take time to process before responding
+- Create action plan for improvement
+- Follow up to show progress
 
 **Red flags:**
 
-- Using fast hash functions (MD5, SHA)
-- Not salting passwords
-- Storing passwords reversibly (encryption)
+- Getting defensive or argumentative
+- Ignoring the feedback
+- No concrete examples or changes
+- Making excuses
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+### Technical Decision Making
+
+**Q:** Describe a time you had to make a difficult technical decision. How did you approach it?
+
+**Key Points to Cover:**
+
+- Research and data gathering process
+- Stakeholders consulted
+- Trade-offs considered
+- How you communicated the decision
+- Outcome and reflection
+
+**Example Structure:**
+
+- **Situation:** Choose between monolith vs microservices for new project
+- **Analysis:**
+  - Researched both approaches
+  - Considered team size/expertise
+  - Evaluated deployment complexity
+  - Assessed scalability needs
+  - Created comparison matrix
+- **Decision:** Started with modular monolith
+- **Rationale:** Easier to maintain with small team, can split later if needed
+- **Communication:** Presented findings to team, documented decision
+- **Result:** Successfully launched, team productive, easy to maintain
+
+**What to emphasize:**
+
+- Systematic approach
+- Data-driven reasoning
+- Considering team/business context
+- Documentation of decisions
+- Willingness to revisit decisions
+
+**Red flags:**
+
+- Following trends without analysis
+- Not considering team capabilities
+- Ignoring business constraints
+- Unable to explain reasoning
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+### Mentoring Others
+
+**Q:** Tell me about a time you helped a junior developer or colleague learn something new.
+
+**Key Points to Cover:**
+
+- How you identified the learning need
+- Your teaching approach
+- How you ensured understanding
+- Their progress and success
+- Your own learning from teaching
+
+**Example Structure:**
+
+- **Situation:** Junior dev struggling with async JavaScript concepts
+- **Approach:**
+  - Scheduled pairing sessions
+  - Started with simple examples (callbacks)
+  - Built up to promises, then async/await
+  - Used visual diagrams for event loop
+  - Gave small practice exercises
+  - Did code reviews with teaching focus
+- **Result:**
+  - They became confident with async code
+  - Started helping other juniors
+  - I improved my explanation skills
+- **Learning:** Teaching reinforces your own understanding
+
+**Good practices:**
+
+- Patient and encouraging
+- Breaking down complex topics
+- Checking for understanding (not just nodding)
+- Giving them space to struggle/learn
+- Celebrating their progress
+
+**Red flags:**
+
+- Impatient or condescending
+- Just giving answers without explaining
+- Not checking for understanding
+- Taking over instead of guiding
 
 [↑ Back to Appendix](#appendix)

@@ -14,18 +14,28 @@
 - [Key Prop in Lists](#react-key-prop)
 - [Context API vs Prop Drilling](#react-context-api)
 - [Performance Optimization](#react-performance-optimization)
+- [useReducer vs useState](#react-usereducer-vs-usestate)
+- [Error Boundaries](#react-error-boundaries)
+- [Controlled vs Uncontrolled Components](#controlled-vs-uncontrolled-components)
+- [Virtual DOM](#virtual-dom)
 
 **Node.js & JavaScript**
 
 - [Event Loop](#nodejs-event-loop)
 - [Promises & Microtasks](#promises--timeout)
 - [Closures](#javascript-closures)
+- [Event Loop Phases](#javascript-event-loop-phases)
+- [Prototypes](#javascript-prototypes)
+- ['this' Keyword](#javascript-this-keyword)
+- [Streams](#nodejs-streams)
 
 **NestJS**
 
 - [Decorator Execution Order](#nestjs-decorator-execution-order)
 - [Guards & Pipes](#nestjs-guards--pipes--error-handling)
 - [NestJS vs Next.js Backend](#nestjs-vs-nextjs-backend)
+- [Modules and Providers](#nestjs-modules-and-providers)
+- [Dependency Injection](#nestjs-dependency-injection)
 
 **Database (PostgreSQL)**
 
@@ -34,16 +44,24 @@
 - [N+1 Query Problem](#n1-query-problem)
 - [SQL Injection Prevention](#sql-injection-prevention)
 - [Normalization](#database-normalization)
+- [Connection Pooling](#database-connection-pooling)
+- [Migrations](#database-migrations)
+- [Composite Indexes](#composite-indexes)
 
 **Authentication & Security**
 
 - [Next.js Authentication](#nextjs-authentication)
 - [OAuth2](#oauth2)
 - [JWT vs Session Authentication](#jwt-vs-session-authentication)
+- [Refresh Tokens](#refresh-tokens)
+- [Password Hashing](#password-hashing)
 
 **TypeScript**
 
 - [Extending Interfaces](#typescript-extending-interfaces)
+- [Generics](#typescript-generics)
+- [Union and Intersection Types](#typescript-union-and-intersection-types)
+- [Type Guards](#typescript-type-guards)
 
 ---
 
@@ -77,7 +95,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 ---
 
-## 2. Redux vs React Query
+## Redux vs React Query
 
 **Q:** When would you use Redux and when React Query?
 
@@ -106,7 +124,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 ---
 
-## 3. Node.js Event Loop
+## Node.js Event Loop
 
 **Q:** Explain the Node.js event loop in simple terms.
 
@@ -585,5 +603,634 @@ function createCounter() {
 
 - Premature optimization
 - Not measuring before optimizing
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## React useReducer vs useState
+
+**Q:** When would you use useReducer instead of useState?
+
+**A:**
+
+**useReducer:**
+
+- Complex state logic with multiple sub-values
+- Next state depends on previous state
+- State transitions need to be predictable
+- Better for testing (pure reducer functions)
+
+**useState:**
+
+- Simple state (primitives, single values)
+- Independent state updates
+- Less boilerplate
+
+**Example:**
+
+```tsx
+const [state, dispatch] = useReducer(reducer, initialState);
+
+// vs
+
+const [count, setCount] = useState(0);
+```
+
+**Red flags:**
+
+- Using useReducer for simple boolean toggles
+- Not understanding reducer pattern
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## React Error Boundaries
+
+**Q:** What are Error Boundaries and how do they work?
+
+**A:**
+
+- Catch JavaScript errors in component tree
+- Display fallback UI instead of crashing
+- Only work in class components (for now)
+- Don't catch errors in event handlers or async code
+
+**Example:**
+
+```tsx
+class ErrorBoundary extends React.Component {
+  componentDidCatch(error, errorInfo) {
+    // Log error
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+**Red flags:**
+
+- Expecting them to catch all errors
+- Not having any error boundaries in production
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Controlled vs Uncontrolled Components
+
+**Q:** What's the difference between controlled and uncontrolled components?
+
+**A:**
+
+**Controlled:**
+
+- React state is the "single source of truth"
+- Value controlled via props and onChange
+- More control, validation, conditional logic
+
+**Uncontrolled:**
+
+- DOM is the source of truth
+- Access via refs
+- Less code, closer to traditional HTML
+
+**Example:**
+
+```tsx
+// Controlled
+<input value={value} onChange={e => setValue(e.target.value)} />
+
+// Uncontrolled
+<input ref={inputRef} defaultValue="initial" />
+```
+
+**Red flags:**
+
+- Mixing controlled/uncontrolled patterns
+- Not understanding when to use each
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Virtual DOM
+
+**Q:** What is the Virtual DOM and why does React use it?
+
+**A:**
+
+- Lightweight JavaScript representation of actual DOM
+- React compares virtual DOM snapshots (diffing)
+- Batches updates to real DOM for efficiency
+- Minimizes expensive DOM operations
+
+**Process:**
+
+1. State changes → new Virtual DOM created
+2. Diff with previous Virtual DOM
+3. Calculate minimal changes needed
+4. Update only changed parts in real DOM
+
+**Red flags:**
+
+- "Virtual DOM is always faster" (not always true)
+- Not understanding reconciliation
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## JavaScript Event Loop Phases
+
+**Q:** What are the different phases of the Node.js event loop?
+
+**A:**
+
+**Phases (in order):**
+
+1. **Timers** - setTimeout, setInterval callbacks
+2. **Pending callbacks** - I/O callbacks deferred
+3. **Idle, prepare** - internal use
+4. **Poll** - retrieve new I/O events
+5. **Check** - setImmediate callbacks
+6. **Close callbacks** - socket.on('close')
+
+**Plus:**
+
+- **process.nextTick()** - executes before any phase
+- **Promises (microtasks)** - execute after current operation
+
+**Red flags:**
+
+- Not understanding execution order
+- Confusing setTimeout(fn, 0) with setImmediate
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## JavaScript Prototypes
+
+**Q:** Explain prototypal inheritance in JavaScript.
+
+**A:**
+
+- Every object has a prototype (another object)
+- Objects inherit properties/methods from prototype
+- Prototype chain ends at null
+- Classes are syntactic sugar over prototypes
+
+**Example:**
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+Person.prototype.greet = function () {
+  return `Hello, ${this.name}`;
+};
+
+const john = new Person("John");
+john.greet(); // "Hello, John"
+```
+
+**Red flags:**
+
+- Confusing with classical inheritance
+- Modifying built-in prototypes
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## JavaScript 'this' Keyword
+
+**Q:** How does the 'this' keyword work in JavaScript?
+
+**A:**
+
+**Context-dependent:**
+
+- **Method call**: `obj.method()` → this = obj
+- **Function call**: `func()` → this = undefined (strict) / window
+- **Constructor**: `new Func()` → this = new object
+- **Arrow functions**: inherit this from enclosing scope
+- **Explicit binding**: call(), apply(), bind()
+
+**Example:**
+
+```js
+const obj = {
+  value: 42,
+  regular: function () {
+    return this.value;
+  },
+  arrow: () => this.value,
+};
+
+obj.regular(); // 42
+obj.arrow(); // undefined (this from outer scope)
+```
+
+**Red flags:**
+
+- Not understanding arrow functions don't bind this
+- Losing context when passing methods as callbacks
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Node.js Streams
+
+**Q:** What are streams in Node.js and when would you use them?
+
+**A:**
+
+- Process data piece by piece (chunks)
+- Don't load entire data into memory
+- Four types: Readable, Writable, Duplex, Transform
+
+**Use cases:**
+
+- Large file processing
+- HTTP requests/responses
+- Database queries with large results
+- Real-time data processing
+
+**Example:**
+
+```js
+const fs = require("fs");
+const readStream = fs.createReadStream("large-file.txt");
+const writeStream = fs.createWriteStream("output.txt");
+
+readStream.pipe(writeStream);
+```
+
+**Red flags:**
+
+- Loading entire files into memory with fs.readFile
+- Not handling backpressure
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## NestJS Modules and Providers
+
+**Q:** What are Modules and Providers in NestJS?
+
+**A:**
+
+**Modules:**
+
+- Organize application structure
+- Encapsulate related components
+- @Module() decorator with imports/exports
+
+**Providers:**
+
+- Injectable dependencies (services, repositories)
+- @Injectable() decorator
+- Managed by NestJS dependency injection
+
+**Example:**
+
+```ts
+@Module({
+  imports: [DatabaseModule],
+  providers: [UserService],
+  controllers: [UserController],
+  exports: [UserService],
+})
+export class UserModule {}
+```
+
+**Red flags:**
+
+- Not understanding dependency injection
+- Circular dependencies between modules
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## NestJS Dependency Injection
+
+**Q:** How does dependency injection work in NestJS?
+
+**A:**
+
+- Constructor-based injection
+- NestJS IoC container manages instances
+- Default scope is Singleton
+- Promotes loose coupling and testability
+
+**Example:**
+
+```ts
+@Injectable()
+export class UserService {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly emailService: EmailService,
+  ) {}
+}
+```
+
+**Scopes:**
+
+- **Singleton** (default) - one instance
+- **Request** - new instance per request
+- **Transient** - new instance each time
+
+**Red flags:**
+
+- Not understanding injection scopes
+- Creating instances with 'new' instead of injection
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Database Connection Pooling
+
+**Q:** What is connection pooling and why is it important?
+
+**A:**
+
+- Reuse database connections instead of creating new ones
+- Pool maintains a set of open connections
+- Reduces connection overhead and latency
+- Limits concurrent connections to database
+
+**Configuration:**
+
+```js
+const pool = new Pool({
+  max: 20, // max connections
+  min: 5, // min connections
+  idle: 10000, // idle timeout
+  acquire: 30000, // acquire timeout
+});
+```
+
+**Red flags:**
+
+- Creating new connection for every query
+- Not closing connections
+- Pool size too large or too small
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Database Migrations
+
+**Q:** What are database migrations and why use them?
+
+**A:**
+
+- Version control for database schema
+- Track and apply schema changes
+- Rollback capabilities
+- Consistency across environments
+
+**Example structure:**
+
+```sql
+-- Up migration
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL
+);
+
+-- Down migration
+DROP TABLE users;
+```
+
+**Tools:** Knex, TypeORM, Prisma Migrate, Flyway
+
+**Red flags:**
+
+- Manual schema changes in production
+- Not testing migrations on staging
+- Missing rollback migrations
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Composite Indexes
+
+**Q:** What are composite indexes and when should you use them?
+
+**A:**
+
+- Index on multiple columns
+- Order of columns matters
+- Useful for queries filtering/sorting on multiple columns
+- Leftmost prefix rule applies
+
+**Example:**
+
+```sql
+CREATE INDEX idx_user_location
+  ON users(country, city, created_at);
+
+-- Works well:
+WHERE country = 'US' AND city = 'NYC'
+
+-- Won't use index:
+WHERE city = 'NYC' (missing leftmost column)
+```
+
+**Red flags:**
+
+- Wrong column order
+- Too many columns (diminishing returns)
+- Not understanding leftmost prefix rule
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## TypeScript Generics
+
+**Q:** What are generics in TypeScript and why use them?
+
+**A:**
+
+- Create reusable components that work with multiple types
+- Type safety without losing type information
+- Commonly used in arrays, promises, functions
+
+**Example:**
+
+```ts
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+interface Repository<T> {
+  find(id: number): Promise<T>;
+  save(entity: T): Promise<T>;
+}
+
+class UserRepository implements Repository<User> {
+  // Type-safe implementation
+}
+```
+
+**Red flags:**
+
+- Using 'any' when generics would work
+- Overly complex generic constraints
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## TypeScript Union and Intersection Types
+
+**Q:** What's the difference between union and intersection types?
+
+**A:**
+
+**Union (|):** Value can be one of several types
+
+```ts
+type Status = "pending" | "approved" | "rejected";
+type ID = string | number;
+```
+
+**Intersection (&):** Combines multiple types
+
+```ts
+type Employee = Person & { employeeId: number };
+type AdminUser = User & Admin & { permissions: string[] };
+```
+
+**Use cases:**
+
+- Union: flexible inputs, discriminated unions
+- Intersection: compose types, extend interfaces
+
+**Red flags:**
+
+- Confusing union with intersection
+- Creating impossible intersections
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## TypeScript Type Guards
+
+**Q:** What are type guards and how do you use them?
+
+**A:**
+
+- Runtime checks that narrow types
+- Help TypeScript understand type at runtime
+- typeof, instanceof, custom type predicates
+
+**Examples:**
+
+```ts
+// typeof guard
+if (typeof value === "string") {
+  value.toUpperCase();
+}
+
+// Custom type guard
+function isUser(obj: any): obj is User {
+  return "id" in obj && "email" in obj;
+}
+
+if (isUser(data)) {
+  console.log(data.email); // TypeScript knows it's User
+}
+```
+
+**Red flags:**
+
+- Using 'any' and type assertions instead
+- Not narrowing union types properly
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Refresh Tokens
+
+**Q:** What are refresh tokens and why use them?
+
+**A:**
+
+- Long-lived tokens to obtain new access tokens
+- Access tokens are short-lived (15 min)
+- Refresh tokens stored securely (httpOnly cookie)
+- Reduces re-authentication frequency
+
+**Flow:**
+
+1. Login → receive access token + refresh token
+2. Access token expires → use refresh token
+3. Get new access token + new refresh token
+4. Logout → invalidate refresh token
+
+**Red flags:**
+
+- Storing refresh tokens in localStorage
+- Not rotating refresh tokens
+- Same expiry for access and refresh tokens
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Password Hashing
+
+**Q:** How should you hash passwords? What algorithm?
+
+**A:**
+
+**Use:** bcrypt or Argon2 (modern choice)
+
+**Never:** MD5, SHA-1, plain SHA-256
+
+**Why:**
+
+- Designed to be slow (resist brute force)
+- Built-in salt generation
+- Adjustable work factor
+
+**Example (bcrypt):**
+
+```js
+const bcrypt = require("bcrypt");
+
+// Hash
+const hash = await bcrypt.hash(password, 10); // 10 rounds
+
+// Verify
+const isValid = await bcrypt.compare(password, hash);
+```
+
+**Red flags:**
+
+- Using fast hash functions (MD5, SHA)
+- Not salting passwords
+- Storing passwords reversibly (encryption)
 
 [↑ Back to Appendix](#appendix)

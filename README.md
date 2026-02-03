@@ -14,8 +14,6 @@
 - [Key Prop in Lists](#react-key-prop)
 - [Context API vs Prop Drilling](#react-context-api)
 - [Performance Optimization](#react-performance-optimization)
-- [useReducer vs useState](#react-usereducer-vs-usestate)
-- [Error Boundaries](#react-error-boundaries)
 - [Controlled vs Uncontrolled Components](#controlled-vs-uncontrolled-components)
 - [Virtual DOM](#virtual-dom)
 
@@ -24,10 +22,7 @@
 - [Event Loop](#nodejs-event-loop)
 - [Promises & Microtasks](#promises--timeout)
 - [Closures](#javascript-closures)
-- [Event Loop Phases](#javascript-event-loop-phases)
-- [Prototypes](#javascript-prototypes)
 - ['this' Keyword](#javascript-this-keyword)
-- [Streams](#nodejs-streams)
 
 **NestJS**
 
@@ -608,81 +603,6 @@ function createCounter() {
 
 ---
 
-## React useReducer vs useState
-
-**Q:** When would you use useReducer instead of useState?
-
-**A:**
-
-**useReducer:**
-
-- Complex state logic with multiple sub-values
-- Next state depends on previous state
-- State transitions need to be predictable
-- Better for testing (pure reducer functions)
-
-**useState:**
-
-- Simple state (primitives, single values)
-- Independent state updates
-- Less boilerplate
-
-**Example:**
-
-```tsx
-const [state, dispatch] = useReducer(reducer, initialState);
-
-// vs
-
-const [count, setCount] = useState(0);
-```
-
-**Red flags:**
-
-- Using useReducer for simple boolean toggles
-- Not understanding reducer pattern
-
-[↑ Back to Appendix](#appendix)
-
----
-
-## React Error Boundaries
-
-**Q:** What are Error Boundaries and how do they work?
-
-**A:**
-
-- Catch JavaScript errors in component tree
-- Display fallback UI instead of crashing
-- Only work in class components (for now)
-- Don't catch errors in event handlers or async code
-
-**Example:**
-
-```tsx
-class ErrorBoundary extends React.Component {
-  componentDidCatch(error, errorInfo) {
-    // Log error
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-    return this.props.children;
-  }
-}
-```
-
-**Red flags:**
-
-- Expecting them to catch all errors
-- Not having any error boundaries in production
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## Controlled vs Uncontrolled Components
 
 **Q:** What's the difference between controlled and uncontrolled components?
@@ -747,70 +667,6 @@ class ErrorBoundary extends React.Component {
 
 ---
 
-## JavaScript Event Loop Phases
-
-**Q:** What are the different phases of the Node.js event loop?
-
-**A:**
-
-**Phases (in order):**
-
-1. **Timers** - setTimeout, setInterval callbacks
-2. **Pending callbacks** - I/O callbacks deferred
-3. **Idle, prepare** - internal use
-4. **Poll** - retrieve new I/O events
-5. **Check** - setImmediate callbacks
-6. **Close callbacks** - socket.on('close')
-
-**Plus:**
-
-- **process.nextTick()** - executes before any phase
-- **Promises (microtasks)** - execute after current operation
-
-**Red flags:**
-
-- Not understanding execution order
-- Confusing setTimeout(fn, 0) with setImmediate
-
-[↑ Back to Appendix](#appendix)
-
----
-
-## JavaScript Prototypes
-
-**Q:** Explain prototypal inheritance in JavaScript.
-
-**A:**
-
-- Every object has a prototype (another object)
-- Objects inherit properties/methods from prototype
-- Prototype chain ends at null
-- Classes are syntactic sugar over prototypes
-
-**Example:**
-
-```js
-function Person(name) {
-  this.name = name;
-}
-
-Person.prototype.greet = function () {
-  return `Hello, ${this.name}`;
-};
-
-const john = new Person("John");
-john.greet(); // "Hello, John"
-```
-
-**Red flags:**
-
-- Confusing with classical inheritance
-- Modifying built-in prototypes
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## JavaScript 'this' Keyword
 
 **Q:** How does the 'this' keyword work in JavaScript?
@@ -844,42 +700,6 @@ obj.arrow(); // undefined (this from outer scope)
 
 - Not understanding arrow functions don't bind this
 - Losing context when passing methods as callbacks
-
-[↑ Back to Appendix](#appendix)
-
----
-
-## Node.js Streams
-
-**Q:** What are streams in Node.js and when would you use them?
-
-**A:**
-
-- Process data piece by piece (chunks)
-- Don't load entire data into memory
-- Four types: Readable, Writable, Duplex, Transform
-
-**Use cases:**
-
-- Large file processing
-- HTTP requests/responses
-- Database queries with large results
-- Real-time data processing
-
-**Example:**
-
-```js
-const fs = require("fs");
-const readStream = fs.createReadStream("large-file.txt");
-const writeStream = fs.createWriteStream("output.txt");
-
-readStream.pipe(writeStream);
-```
-
-**Red flags:**
-
-- Loading entire files into memory with fs.readFile
-- Not handling backpressure
 
 [↑ Back to Appendix](#appendix)
 

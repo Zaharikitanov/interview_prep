@@ -8,54 +8,53 @@
 
 **React**
 
-- [Redux vs React Query](#redux-vs-react-query)
+- [Virtual DOM](#virtual-dom)
 - [React Hooks - useMemo vs useCallback](#react-hooks)
 - [useEffect Cleanup](#react-useeffect-cleanup)
 - [Context API vs Prop Drilling](#react-context-api)
+- [Redux vs React Query](#redux-vs-react-query)
 - [Performance Optimization](#react-performance-optimization)
-- [Controlled vs Uncontrolled Components](#controlled-vs-uncontrolled-components)
-- [Virtual DOM](#virtual-dom)
 
 **Node.js & JavaScript**
 
-- [Event Loop](#nodejs-event-loop)
-- [Promises & Microtasks](#promises--timeout)
 - [Closures](#javascript-closures)
 - ['this' Keyword](#javascript-this-keyword)
+- [Promises & Microtasks](#promises--timeout)
+- [Event Loop](#nodejs-event-loop)
 
 **NestJS**
 
-- [Decorator Execution Order](#nestjs-decorator-execution-order)
-- [Guards & Pipes](#nestjs-guards--pipes--error-handling)
 - [Modules and Providers](#nestjs-modules-and-providers)
 - [Dependency Injection](#nestjs-dependency-injection)
+- [Guards & Pipes](#nestjs-guards--pipes--error-handling)
+- [Decorator Execution Order](#nestjs-decorator-execution-order)
 
 **Database (PostgreSQL)**
 
-- [Indexes](#postgresql-indexes)
-- [N+1 Query Problem](#n1-query-problem)
 - [SQL Injection Prevention](#sql-injection-prevention)
+- [Indexes](#postgresql-indexes)
 - [Normalization](#database-normalization)
 - [Migrations](#database-migrations)
+- [N+1 Query Problem](#n1-query-problem)
 - [Composite Indexes](#composite-indexes)
 
 **Authentication & Security**
 
-- [Next.js Authentication](#nextjs-authentication)
-- [OAuth2](#oauth2)
 - [JWT vs Session Authentication](#jwt-vs-session-authentication)
+- [OAuth2](#oauth2)
+- [Next.js Authentication](#nextjs-authentication)
 
 **TypeScript**
 
 - [Extending Interfaces](#typescript-extending-interfaces)
-- [Generics](#typescript-generics)
 - [Union and Intersection Types](#typescript-union-and-intersection-types)
+- [Generics](#typescript-generics)
 
 **Behavioral & Soft Skills**
 
-- [Disagreement with Team Member](#disagreement-with-team-member)
 - [Learning from Mistakes](#learning-from-mistakes)
 - [Receiving Critical Feedback](#receiving-critical-feedback)
+- [Disagreement with Team Member](#disagreement-with-team-member)
 - [Technical Decision Making](#technical-decision-making)
 - [Mentoring Others](#mentoring-others)
 
@@ -528,43 +527,6 @@ function createCounter() {
 
 - Premature optimization
 - Not measuring before optimizing
-
-[↑ Back to Appendix](#appendix)
-
----
-
-## Controlled vs Uncontrolled Components
-
-**Q:** What's the difference between controlled and uncontrolled components?
-
-**A:**
-
-**Controlled:**
-
-- React state is the "single source of truth"
-- Value controlled via props and onChange
-- More control, validation, conditional logic
-
-**Uncontrolled:**
-
-- DOM is the source of truth
-- Access via refs
-- Less code, closer to traditional HTML
-
-**Example:**
-
-```tsx
-// Controlled
-<input value={value} onChange={e => setValue(e.target.value)} />
-
-// Uncontrolled
-<input ref={inputRef} defaultValue="initial" />
-```
-
-**Red flags:**
-
-- Mixing controlled/uncontrolled patterns
-- Not understanding when to use each
 
 [↑ Back to Appendix](#appendix)
 

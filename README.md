@@ -11,6 +11,7 @@
 - [Virtual DOM](#virtual-dom)
 - [React Hooks - useMemo vs useCallback](#react-hooks)
 - [useEffect Cleanup](#react-useeffect-cleanup)
+- [Custom Hooks](#custom-hooks)
 - [Context API vs Prop Drilling](#react-context-api)
 - [Redux vs React Query](#redux-vs-react-query)
 - [Performance Optimization](#react-performance-optimization)
@@ -333,6 +334,74 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 - Not cleaning up event listeners
 - Not canceling API requests
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Custom Hooks
+
+**Q:** What are custom hooks and when would you create one?
+
+**A:**
+
+**Definition:** Functions that start with "use" and can call other hooks. Extract reusable stateful logic.
+
+**When to create:**
+
+- Reusing stateful logic across multiple components
+- Sharing complex logic without prop drilling
+- Abstracting component logic for better readability
+- Encapsulating side effects and state management
+
+**Common use cases:**
+
+1. **Data Fetching**
+   - useApi, useFetch, useQuery
+   - Handle loading, error, and data states
+   - Automatic cleanup and cancellation
+
+2. **Form Handling**
+   - useForm, useInput, useValidation
+   - Manage form state, validation, submission
+   - Reusable across multiple forms
+
+3. **Browser APIs**
+   - useLocalStorage, useSessionStorage
+   - useWindowSize, useMediaQuery
+   - useGeolocation, useOnlineStatus
+
+4. **Event Listeners**
+   - useEventListener, useClickOutside
+   - useKeyPress, useDebounce
+   - Automatic cleanup on unmount
+
+5. **Authentication/Authorization**
+   - useAuth, usePermissions
+   - Centralize auth logic
+   - Share user state across components
+
+**Rules:**
+
+- Must start with "use" prefix
+- Can call other hooks inside
+- Follow all hooks rules (top level, React functions only)
+- Return values/functions that components need
+
+**Benefits:**
+
+- DRY (Don't Repeat Yourself)
+- Easier testing (test hooks independently)
+- Better code organization
+- Share logic without render props or HOCs
+
+**Red flags:**
+
+- Creating hooks for non-reusable logic
+- Not following hooks naming convention
+- Overcomplicating simple logic
+- Breaking hooks rules inside custom hooks
+- Creating hooks that are too tightly coupled to specific components
 
 [↑ Back to Appendix](#appendix)
 

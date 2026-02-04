@@ -12,7 +12,6 @@
 - [React Hooks - useMemo vs useCallback](#react-hooks)
 - [useEffect Cleanup](#react-useeffect-cleanup)
 - [Custom Hooks](#custom-hooks)
-- [Context API vs Prop Drilling](#react-context-api)
 - [Redux vs React Query](#redux-vs-react-query)
 - [Performance Optimization](#react-performance-optimization)
 
@@ -30,6 +29,8 @@
 - [Dependency Injection](#nestjs-dependency-injection)
 - [Guards & Pipes](#nestjs-guards--pipes--error-handling)
 - [Decorator Execution Order](#nestjs-decorator-execution-order)
+- [Interceptors](#nestjs-interceptors)
+- [Custom Decorators](#nestjs-custom-decorators)
 
 **Database (PostgreSQL)**
 
@@ -41,6 +42,7 @@
 - [N+1 Query Problem](#n1-query-problem)
 - [Composite Indexes](#composite-indexes)
 - [Table Partitioning](#table-partitioning)
+- [CAP Theorem](#cap-theorem)
 
 **Authentication & Security**
 
@@ -91,6 +93,142 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Exception filters catch errors thrown anywhere below them
 
 [↑ Back to Appendix](#appendix)
+
+---
+
+## NestJS Interceptors
+
+**Q:** What are Interceptors in NestJS and when would you use them?
+
+**A:**
+
+**Definition:** Classes with @Injectable() that implement NestInterceptor interface. Execute logic before and after route handler execution.
+
+**Execution:**
+
+- Run before the handler (transform request)
+- Run after the handler (transform response)
+- Wrap handler execution using RxJS operators
+
+**Common use cases:**
+
+1. **Response Transformation**
+   - Wrap responses in standard format
+   - Add metadata (timestamps, request IDs)
+   - Transform data structure
+
+2. **Logging & Monitoring**
+   - Log request/response data
+   - Track execution time
+   - Performance monitoring
+
+3. **Caching**
+   - Cache responses
+   - Check cache before handler execution
+   - Return cached data when available
+
+4. **Error Handling**
+   - Catch and transform exceptions
+   - Add context to errors
+   - Retry logic
+
+5. **Timeout Management**
+   - Set request timeouts
+   - Cancel long-running requests
+
+**Key methods:**
+
+- `intercept(context, next)` - main method
+- Uses RxJS operators: map, tap, catchError, timeout
+
+**Scope:**
+
+- Global (app.useGlobalInterceptors)
+- Controller level (@UseInterceptors)
+- Route level (@UseInterceptors on method)
+
+**Difference from Middleware:**
+
+- Interceptors have access to ExecutionContext
+- Can access route handler and class
+- Execute after Guards and Pipes
+- Can transform responses (middleware cannot)
+
+**Red flags:**
+
+- Using interceptors for authentication (use Guards)
+- Heavy business logic in interceptors
+- Not understanding execution order
+- Blocking operations without proper async handling
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## NestJS Custom Decorators
+
+**Q:** How do you create and use custom decorators in NestJS?
+
+**A:**
+
+**Types of custom decorators:**
+
+1. **Parameter Decorators**
+   - Extract data from request
+   - Access user, headers, query params
+   - Combine with pipes for transformation/validation
+
+2. **Method Decorators**
+   - Add metadata to routes
+   - Combine multiple decorators
+   - Create authorization decorators
+
+3. **Class Decorators**
+   - Apply metadata to entire controller
+   - Set common configuration
+
+**Common use cases:**
+
+1. **User Extraction**
+   - @CurrentUser() - get authenticated user
+   - @UserId() - extract user ID
+   - Clean controller methods
+
+2. **Authorization**
+   - @Roles('admin', 'user') - role-based access
+   - @Public() - skip authentication
+   - @Permissions() - permission checks
+
+3. **Request Data**
+   - @IpAddress() - get client IP
+   - @UserAgent() - get user agent
+   - @Headers() - specific headers
+
+4. **Validation & Transformation**
+   - Combine with pipes
+   - Parse and validate custom data
+
+**Benefits:**
+
+- Cleaner, more readable controllers
+- Reusable logic across routes
+- Type safety with TypeScript
+- Separation of concerns
+- Easier testing
+
+**Composition:**
+
+- Use applyDecorators() to combine multiple decorators
+- Create complex decorators from simple ones
+- Maintain consistency across application
+
+**Red flags:**
+
+- Overusing decorators for simple logic
+- Not understanding decorator execution context
+- Creating decorators with side effects
+- Poor naming conventions
+- Not leveraging built-in decorators when available
 
 ---
 
@@ -513,32 +651,6 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 ---
 
-## React Context API
-
-**Q:** When would you use Context API vs prop drilling?
-
-**A:**
-
-**Context API:**
-
-- Avoid prop drilling through many levels
-- Share global state (theme, user, language)
-- Don't overuse for local state
-
-**Trade-offs:**
-
-- All consumers re-render when context changes
-- Consider splitting contexts
-
-**Red flags:**
-
-- Using Context for everything
-- "Context replaces Redux"
-
-[↑ Back to Appendix](#appendix)
-
----
-
 ## Database Normalization
 
 **Q:** What is database normalization?
@@ -638,6 +750,66 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Wrong partition key choice
 - Not automating partition creation
 - Ignoring maintenance overhead
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## CAP Theorem
+
+**Q:** What is the CAP theorem?
+
+**A:**
+
+**Definition:** In a distributed system, you can only guarantee 2 out of 3 properties:
+
+1. **Consistency (C)** - All nodes see the same data at the same time
+2. **Availability (A)** - Every request gets a response (success or failure)
+3. **Partition Tolerance (P)** - System continues despite network partitions
+
+**Key insight:** Network partitions will happen, so you must choose between Consistency or Availability.
+
+**Trade-offs:**
+
+**CP (Consistency + Partition Tolerance):**
+
+- Sacrifice availability during partitions
+- Wait for all nodes to sync before responding
+- Examples: MongoDB (in certain configs), HBase, Redis Cluster
+- Use when: Data accuracy is critical (financial transactions)
+
+**AP (Availability + Partition Tolerance):**
+
+- Sacrifice consistency during partitions
+- Always respond, even with stale data
+- Examples: Cassandra, DynamoDB, CouchDB
+- Use when: Uptime is critical, eventual consistency acceptable
+
+**CA (Consistency + Availability):**
+
+- Not realistic in distributed systems
+- Only possible without network partitions
+- Single-node databases (traditional RDBMS)
+
+**Eventual Consistency:**
+
+- Common in AP systems
+- Data will become consistent over time
+- Acceptable delay between updates propagating
+
+**Real-world examples:**
+
+- **Banking** → CP (can't show wrong balance)
+- **Social media feeds** → AP (okay to show slightly old posts)
+- **Shopping cart** → AP (better to let user add items than show error)
+- **Inventory systems** → CP (prevent overselling)
+
+**Red flags:**
+
+- "You can have all three"
+- Not understanding network partitions are inevitable
+- Choosing wrong trade-off for use case
+- Not knowing eventual consistency
 
 [↑ Back to Appendix](#appendix)
 

@@ -21,6 +21,7 @@
 - ['this' Keyword](#javascript-this-keyword)
 - [Promises & Microtasks](#promises--timeout)
 - [Event Loop](#nodejs-event-loop)
+- [Handling Long-Running Requests](#handling-long-running-requests)
 
 **NestJS**
 
@@ -34,9 +35,11 @@
 - [SQL Injection Prevention](#sql-injection-prevention)
 - [Indexes](#postgresql-indexes)
 - [Normalization](#database-normalization)
+- [Many-to-Many Relationships](#many-to-many-relationships)
 - [Migrations](#database-migrations)
 - [N+1 Query Problem](#n1-query-problem)
 - [Composite Indexes](#composite-indexes)
+- [Table Partitioning](#table-partitioning)
 
 **Authentication & Security**
 
@@ -67,14 +70,14 @@
 **A:**  
 For an incoming HTTP request, the execution order is:
 
-1. **Middleware**
-2. **Guards**
-3. **Interceptors (before handler)**
-4. **Pipes**
-5. **Controller method (handler)**
-6. **Interceptors (after handler)**
-7. **Exception Filters**
-8. **Response sent to client**
+1. **Middleware** - logging, CORS, body parsing
+2. **Guards** - authentication, role-based authorization
+3. **Interceptors (before handler)** - transform request, add timing
+4. **Pipes** - validate/transform DTOs, parse params
+5. **Controller method (handler)** - business logic execution
+6. **Interceptors (after handler)** - transform response, add metadata
+7. **Exception Filters** - catch errors, format error responses
+8. **Response sent to client** - final HTTP response
 
 **One-line summary:**  
 Middleware → Guards → Interceptors → Pipes → Controller → Interceptors → Exception Filters
@@ -139,6 +142,62 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 - “Node.js is multi-threaded”
 - Cannot explain it in simple words
+  [↑ Back to Appendix](#appendix)
+
+---
+
+## Handling Long-Running Requests
+
+**Q:** How would you handle a request that takes a long time to process?
+
+**A:**
+
+**Strategies:**
+
+1. **Identify the Bottleneck First**
+   - Profile the request (measure execution time)
+   - Check for multiple consecutive async requests (waterfall pattern)
+   - Analyze database query performance (slow query logs)
+   - Monitor API response times
+
+2. **Optimize Multiple Async Requests**
+   - Run independent requests in parallel (Promise.all)
+   - Avoid sequential await when possible
+   - Batch multiple requests into single calls
+   - Use GraphQL DataLoader to prevent N+1 queries
+   - Example: fetch user + posts + comments concurrently, not sequentially
+
+3. **Database Operation Improvements**
+   - Identify slow queries (EXPLAIN/ANALYZE)
+   - Add missing indexes on filtered/joined columns
+   - Optimize query structure (avoid SELECT \*, use specific columns)
+   - Fix N+1 query problems (eager loading, JOINs)
+   - Use connection pooling
+   - Consider read replicas for heavy read operations
+   - Implement query result caching
+   - Use pagination instead of loading all records
+
+4. **Caching**
+   - Cache expensive computations (Redis, Memcached)
+   - Use stale-while-revalidate pattern
+   - Reduce redundant processing
+   - Best for: frequently accessed, slow-changing data
+
+**Key Considerations:**
+
+- User experience (progress indicators, estimated time)
+- Idempotency (can retry safely)
+- Error handling and recovery
+- Resource limits (prevent resource exhaustion)
+- Monitoring and alerting
+
+**Red flags:**
+
+- Blocking the event loop with synchronous operations
+- No timeout handling
+- Not considering user experience
+- Ignoring memory/resource limits
+- No retry or error recovery strategy
 
 ---
 
@@ -234,15 +293,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 **A:**
 
-```ts
-interface User {
-  id: number;
-}
-
-interface Admin extends User {
-  role: string;
-}
-```
+Use the `extends` keyword to inherit properties from a parent interface.
 
 [↑ Back to Appendix](#appendix)
 
@@ -258,13 +309,6 @@ interface Admin extends User {
 - `useCallback` → memoizes a **function**
 - Both prevent unnecessary re-computations
 - Use when passing props to child components
-
-**Example:**
-
-```tsx
-const expensiveValue = useMemo(() => computeValue(data), [data]);
-const handleClick = useCallback(() => doSomething(id), [id]);
-```
 
 **Red flags:**
 
@@ -284,15 +328,6 @@ const handleClick = useCallback(() => doSomething(id), [id]);
 - Prevent memory leaks
 - Cancel subscriptions, timers, event listeners
 - Runs when component unmounts or before re-running effect
-
-**Example:**
-
-```tsx
-useEffect(() => {
-  const timer = setTimeout(() => {}, 1000);
-  return () => clearTimeout(timer); // cleanup
-}, []);
-```
 
 **Red flags:**
 
@@ -319,12 +354,6 @@ useEffect(() => {
 - Hash
 - GIN (for JSONB, arrays)
 
-**Example:**
-
-```sql
-CREATE INDEX idx_user_email ON users(email);
-```
-
 **Red flags:**
 
 - Not understanding the write trade-off
@@ -343,23 +372,6 @@ CREATE INDEX idx_user_email ON users(email);
 - Making N additional queries in a loop
 - Common in ORMs without proper eager loading
 - Solution: Use JOIN or eager loading
-
-**Bad example:**
-
-```js
-const users = await User.findAll(); // 1 query
-for (const user of users) {
-  const posts = await user.getPosts(); // N queries
-}
-```
-
-**Good example:**
-
-```js
-const users = await User.findAll({
-  include: [Post], // 1 query with JOIN
-});
-```
 
 [↑ Back to Appendix](#appendix)
 
@@ -404,19 +416,6 @@ const users = await User.findAll({
 - Use parameterized queries / prepared statements
 - Use ORM query builders
 
-**Bad:**
-
-```js
-const query = `SELECT * FROM users WHERE id = ${userId}`;
-```
-
-**Good:**
-
-```js
-const query = "SELECT * FROM users WHERE id = $1";
-await db.query(query, [userId]);
-```
-
 **Red flags:**
 
 - Not knowing what SQL injection is
@@ -435,18 +434,6 @@ await db.query(query, [userId]);
 - Function that has access to outer scope variables
 - Even after outer function has returned
 - Creates private variables
-
-**Example:**
-
-```js
-function createCounter() {
-  let count = 0;
-  return {
-    increment: () => ++count,
-    getCount: () => count,
-  };
-}
-```
 
 **Red flags:**
 
@@ -505,6 +492,83 @@ function createCounter() {
 
 - Over-normalizing (too many JOINs)
 - Not understanding when to denormalize
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Many-to-Many Relationships
+
+**Q:** How do you resolve many-to-many relationships in a database? Is it a good practice?
+
+**A:**
+
+**Solution:** Use a bridge table (junction table) with foreign keys to both tables.
+
+**Yes, it's good practice:**
+
+- Maintains data integrity
+- Avoids data duplication
+- Follows normalization principles
+- Enables efficient querying
+
+**Additional data in bridge tables:**
+
+- Can store relationship-specific data (enrollment date, grades, status)
+- Composite primary key prevents duplicates
+
+**Red flags:**
+
+- Storing comma-separated IDs instead of proper relationships
+- Not using foreign key constraints
+- Duplicating data across tables
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Table Partitioning
+
+**Q:** What is table partitioning and when should you use it?
+
+**A:**
+
+**Definition:** Splitting a large table into smaller, more manageable pieces (partitions) while appearing as a single table.
+
+**When to use:**
+
+- Very large tables (millions/billions of rows)
+- Time-series data (logs, events, metrics)
+- Queries typically filter by partition key
+- Need to archive/delete old data efficiently
+- Improve query performance on specific ranges
+
+**Types:**
+
+- **Range partitioning** → by date ranges, numeric ranges
+- **List partitioning** → by specific values (country, status)
+- **Hash partitioning** → distribute evenly across partitions
+
+**Benefits:**
+
+- **Query performance** → scan only relevant partitions (partition pruning)
+- **Maintenance** → easier to archive/drop old partitions
+- **Bulk operations** → faster on specific partitions
+- **Index size** → smaller indexes per partition
+
+**Trade-offs:**
+
+- Added complexity
+- Need to manage partition creation
+- Cross-partition queries can be slower
+- More planning required
+
+**Red flags:**
+
+- Partitioning small tables unnecessarily
+- Wrong partition key choice
+- Not automating partition creation
+- Ignoring maintenance overhead
 
 [↑ Back to Appendix](#appendix)
 
@@ -573,21 +637,6 @@ function createCounter() {
 - **Arrow functions**: inherit this from enclosing scope
 - **Explicit binding**: call(), apply(), bind()
 
-**Example:**
-
-```js
-const obj = {
-  value: 42,
-  regular: function () {
-    return this.value;
-  },
-  arrow: () => this.value,
-};
-
-obj.regular(); // 42
-obj.arrow(); // undefined (this from outer scope)
-```
-
 **Red flags:**
 
 - Not understanding arrow functions don't bind this
@@ -615,18 +664,6 @@ obj.arrow(); // undefined (this from outer scope)
 - @Injectable() decorator
 - Managed by NestJS dependency injection
 
-**Example:**
-
-```ts
-@Module({
-  imports: [DatabaseModule],
-  providers: [UserService],
-  controllers: [UserController],
-  exports: [UserService],
-})
-export class UserModule {}
-```
-
 **Red flags:**
 
 - Not understanding dependency injection
@@ -646,18 +683,6 @@ export class UserModule {}
 - NestJS IoC container manages instances
 - Default scope is Singleton
 - Promotes loose coupling and testability
-
-**Example:**
-
-```ts
-@Injectable()
-export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly emailService: EmailService,
-  ) {}
-}
-```
 
 **Scopes:**
 
@@ -685,19 +710,6 @@ export class UserService {
 - Rollback capabilities
 - Consistency across environments
 
-**Example structure:**
-
-```sql
--- Up migration
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL
-);
-
--- Down migration
-DROP TABLE users;
-```
-
 **Tools:** Knex, TypeORM, Prisma Migrate, Flyway
 
 **Red flags:**
@@ -721,19 +733,6 @@ DROP TABLE users;
 - Useful for queries filtering/sorting on multiple columns
 - Leftmost prefix rule applies
 
-**Example:**
-
-```sql
-CREATE INDEX idx_user_location
-  ON users(country, city, created_at);
-
--- Works well:
-WHERE country = 'US' AND city = 'NYC'
-
--- Won't use index:
-WHERE city = 'NYC' (missing leftmost column)
-```
-
 **Red flags:**
 
 - Wrong column order
@@ -754,23 +753,6 @@ WHERE city = 'NYC' (missing leftmost column)
 - Type safety without losing type information
 - Commonly used in arrays, promises, functions
 
-**Example:**
-
-```ts
-function identity<T>(arg: T): T {
-  return arg;
-}
-
-interface Repository<T> {
-  find(id: number): Promise<T>;
-  save(entity: T): Promise<T>;
-}
-
-class UserRepository implements Repository<User> {
-  // Type-safe implementation
-}
-```
-
 **Red flags:**
 
 - Using 'any' when generics would work
@@ -788,17 +770,7 @@ class UserRepository implements Repository<User> {
 
 **Union (|):** Value can be one of several types
 
-```ts
-type Status = "pending" | "approved" | "rejected";
-type ID = string | number;
-```
-
 **Intersection (&):** Combines multiple types
-
-```ts
-type Employee = Person & { employeeId: number };
-type AdminUser = User & Admin & { permissions: string[] };
-```
 
 **Use cases:**
 
@@ -830,13 +802,6 @@ type AdminUser = User & Admin & { permissions: string[] };
 - Explain how you reached a resolution
 - Highlight positive outcome or learning
 
-**Example Structure:**
-
-- **Situation:** Working on API design, disagreed on REST vs GraphQL
-- **Task:** Needed to choose an approach that worked for the team
-- **Action:** Scheduled meeting, presented pros/cons, created POC for both
-- **Result:** Agreed on hybrid approach, team satisfied, project succeeded
-
 **Red flags:**
 
 - Blaming others or being defensive
@@ -859,18 +824,6 @@ type AdminUser = User & Admin & { permissions: string[] };
 - Describe immediate actions to fix it
 - What processes you changed to prevent it
 - Show growth and maturity
-
-**Example Structure:**
-
-- **Situation:** Deployed code to production without running full test suite
-- **Impact:** Bug affected 20% of users for 2 hours
-- **Action:**
-  - Immediately rolled back deployment
-  - Fixed bug and added missing tests
-  - Communicated with users about issue
-  - Created deployment checklist
-  - Set up automated pre-deploy test requirement
-- **Learning:** Importance of process over speed, better CI/CD setup
 
 **What interviewers want to see:**
 
@@ -901,18 +854,6 @@ type AdminUser = User & Admin & { permissions: string[] };
 - Asked clarifying questions
 - Made concrete changes
 - Followed up to show improvement
-
-**Example Structure:**
-
-- **Situation:** Code review feedback that my PRs were too large/complex
-- **Initial Response:** Felt defensive but took time to reflect
-- **Action:**
-  - Asked reviewer for specific examples
-  - Reviewed my recent PRs objectively
-  - Started breaking work into smaller chunks
-  - Asked for feedback on new approach
-  - Shared learnings with junior devs
-- **Result:** PRs reviewed faster, fewer bugs, better collaboration
 
 **Good approaches:**
 
@@ -945,20 +886,6 @@ type AdminUser = User & Admin & { permissions: string[] };
 - How you communicated the decision
 - Outcome and reflection
 
-**Example Structure:**
-
-- **Situation:** Choose between monolith vs microservices for new project
-- **Analysis:**
-  - Researched both approaches
-  - Considered team size/expertise
-  - Evaluated deployment complexity
-  - Assessed scalability needs
-  - Created comparison matrix
-- **Decision:** Started with modular monolith
-- **Rationale:** Easier to maintain with small team, can split later if needed
-- **Communication:** Presented findings to team, documented decision
-- **Result:** Successfully launched, team productive, easy to maintain
-
 **What to emphasize:**
 
 - Systematic approach
@@ -989,22 +916,6 @@ type AdminUser = User & Admin & { permissions: string[] };
 - How you ensured understanding
 - Their progress and success
 - Your own learning from teaching
-
-**Example Structure:**
-
-- **Situation:** Junior dev struggling with async JavaScript concepts
-- **Approach:**
-  - Scheduled pairing sessions
-  - Started with simple examples (callbacks)
-  - Built up to promises, then async/await
-  - Used visual diagrams for event loop
-  - Gave small practice exercises
-  - Did code reviews with teaching focus
-- **Result:**
-  - They became confident with async code
-  - Started helping other juniors
-  - I improved my explanation skills
-- **Learning:** Teaching reinforces your own understanding
 
 **Good practices:**
 

@@ -44,12 +44,6 @@
 - [Table Partitioning](#table-partitioning)
 - [CAP Theorem](#cap-theorem)
 
-**Authentication & Security**
-
-- [JWT vs Session Authentication](#jwt-vs-session-authentication)
-- [OAuth2](#oauth2)
-- [Next.js Authentication](#nextjs-authentication)
-
 **TypeScript**
 
 - [Extending Interfaces](#typescript-extending-interfaces)
@@ -62,6 +56,12 @@
 - [SOLID Principles](#solid-principles)
 - [Abstract Class vs Interface](#abstract-class-vs-interface)
 - [Practical OOP & Design Situations](#practical-oop--design-situations)
+
+**Authentication & Security**
+
+- [JWT vs Session Authentication](#jwt-vs-session-authentication)
+- [OAuth2](#oauth2)
+- [Next.js Authentication](#nextjs-authentication)
 
 **Behavioral & Soft Skills**
 

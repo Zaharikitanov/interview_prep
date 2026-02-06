@@ -56,6 +56,13 @@
 - [Union and Intersection Types](#typescript-union-and-intersection-types)
 - [Generics](#typescript-generics)
 
+**OOP & Design Principles**
+
+- [Four Pillars of OOP](#four-pillars-of-oop)
+- [SOLID Principles](#solid-principles)
+- [Abstract Class vs Interface](#abstract-class-vs-interface)
+- [Practical OOP & Design Situations](#practical-oop--design-situations)
+
 **Behavioral & Soft Skills**
 
 - [Learning from Mistakes](#learning-from-mistakes)
@@ -1172,5 +1179,161 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Just giving answers without explaining
 - Not checking for understanding
 - Taking over instead of guiding
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Four Pillars of OOP
+
+**Q:** What are the four pillars of object-oriented programming?
+
+**A:**
+
+1. **Encapsulation**
+   - Bundle data + behavior, hide internal state
+   - Access through public methods; enforce invariants
+
+2. **Abstraction**
+   - Expose only essential details
+   - Hide complexity behind a simple interface
+
+3. **Inheritance**
+   - Reuse behavior by extending a base class
+   - Models an “is-a” relationship
+
+4. **Polymorphism**
+   - Same interface, different implementations
+   - Subtypes can be used interchangeably
+
+**Common follow-ups:**
+
+- When to prefer composition over inheritance
+- Examples of polymorphism in TypeScript/JavaScript
+
+**Red flags:**
+
+- “Inheritance is always better”
+- Confusing abstraction with encapsulation
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## SOLID Principles
+
+**Q:** What does SOLID stand for?
+
+**A:**
+
+1. **S — Single Responsibility Principle**
+   - A class/module should have one reason to change
+
+2. **O — Open/Closed Principle**
+   - Open for extension, closed for modification
+
+3. **L — Liskov Substitution Principle**
+   - Subtypes must be substitutable for their base types
+
+4. **I — Interface Segregation Principle**
+   - Prefer small, specific interfaces over “fat” ones
+
+5. **D — Dependency Inversion Principle**
+   - Depend on abstractions, not concrete implementations
+
+**Example cues:**
+
+- Use interfaces for external services (DIP)
+- Split large services into focused ones (SRP)
+
+**Red flags:**
+
+- “SOLID means use inheritance everywhere”
+- Changing base types breaks derived behavior (LSP violation)
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Abstract Class vs Interface
+
+**Q:** When would you use an abstract class vs an interface?
+
+**A:**
+
+**Abstract class**
+
+- Can provide shared implementation and state
+- Allows non-abstract methods
+- Enforces a common base with partial behavior
+
+**Interface**
+
+- Defines a contract only
+- Multiple interfaces can be implemented
+- Better for decoupling and testing
+
+**Rule of thumb:**
+
+- Use an **interface** for capabilities/roles
+- Use an **abstract class** when you need shared base behavior
+
+**Common follow-ups:**
+
+- Can a class implement multiple interfaces? (Yes)
+- Can a class extend multiple classes? (No)
+
+**Red flags:**
+
+- Using abstract classes just to “share types”
+- Overusing inheritance for code reuse
+
+[↑ Back to Appendix](#appendix)
+
+---
+
+## Practical OOP & Design Situations
+
+**Q:** What real-world situations show up where OOP/design principles matter?
+
+**A:**
+
+1. **Adding a new payment provider**
+   - Use an interface for `PaymentGateway`
+   - Add a new implementation without changing existing flows
+
+2. **Introducing a new notification channel (email/SMS/push)**
+   - Use polymorphism to avoid `if/else` chains
+   - Extend with new channel implementations
+
+3. **Refactoring a “God” service**
+   - Split by responsibility (SRP)
+   - Improve cohesion and testability
+
+4. **Swapping a data source (REST → GraphQL)**
+   - Depend on abstractions (DIP)
+   - Keep callers unchanged
+
+5. **Shared logic across similar entities**
+   - Use composition (shared helpers) before inheritance
+   - Avoid deep class hierarchies
+
+6. **Feature flagging behavior**
+   - Prefer strategy pattern (polymorphism)
+   - Replace conditionals with interchangeable strategies
+
+7. **Large interface with unused methods**
+   - Split into smaller interfaces (ISP)
+   - Reduce forced implementations
+
+8. **Breaking API changes from base class**
+   - Validate substitutability (LSP)
+   - Avoid narrowing method contracts
+
+**Red flags:**
+
+- Changes requiring edits across many unrelated classes
+- Fragile inheritance trees
+- Widespread conditional logic on type
 
 [↑ Back to Appendix](#appendix)

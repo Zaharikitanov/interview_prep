@@ -1,4 +1,4 @@
-# Mid-Level Full-Stack Interview Questions (React / Node / NestJS / PostgreSQL)
+﻿# Mid-Level Full-Stack Interview Questions (React / Node / NestJS / PostgreSQL)
 
 ---
 
@@ -90,7 +90,7 @@ For an incoming HTTP request, the execution order is:
 8. **Response sent to client** - final HTTP response
 
 **One-line summary:**  
-Middleware → Guards → Interceptors → Pipes → Controller → Interceptors → Exception Filters
+Middleware â†’ Guards â†’ Interceptors â†’ Pipes â†’ Controller â†’ Interceptors â†’ Exception Filters
 
 **Notes:**
 
@@ -99,7 +99,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Interceptors wrap the execution (before & after)
 - Exception filters catch errors thrown anywhere below them
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -168,7 +168,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Not understanding execution order
 - Blocking operations without proper async handling
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -245,11 +245,11 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 **A:**
 
-- Redux → client state
+- Redux â†’ client state
   - UI state
   - auth state
   - forms, filters
-- React Query → server state
+- React Query â†’ server state
   - data fetching
   - caching
   - background refetch
@@ -263,7 +263,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 **Red flags:**
 
-- “React Query replaces Redux”
+- â€œReact Query replaces Reduxâ€
 - Using Redux for everything
 
 ---
@@ -274,21 +274,161 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 **A:**
 
-- Node.js is single-threaded
-- Uses non-blocking I/O
-- Async operations are delegated to the OS
-- Event loop processes queues when the call stack is free
+**Core Concept:**
 
-**Bonus:**
+- Node.js runs on a single thread (main thread)
+- Uses non-blocking I/O for concurrent operations
+- Event loop coordinates execution of callbacks
+- Async operations (file I/O, network) are handled by libuv (C++ library)
+- When async operations complete, their callbacks are queued
+- Event loop processes these queues when call stack is empty
 
-- Microtasks → Promises
-- Macrotasks → setTimeout
+**How it works:**
 
-**Red flags:**
+1. Execute synchronous code (call stack)
+2. When call stack is empty, check queues
+3. Execute callbacks from queues in specific order
+4. Repeat (loop)
 
-- “Node.js is multi-threaded”
-- Cannot explain it in simple words
-  [↑ Back to Appendix](#appendix)
+**Event Loop Phases (in order):**
+
+1. **Timers Phase**
+   - Executes callbacks from `setTimeout()` and `setInterval()`
+   - Only runs callbacks whose timer has expired
+
+2. **Pending Callbacks Phase**
+   - Executes I/O callbacks deferred from previous iteration
+   - System operations (TCP errors, etc.)
+
+3. **Idle, Prepare Phase**
+   - Internal use only
+
+4. **Poll Phase** (most important)
+   - Retrieves new I/O events
+   - Executes I/O callbacks (except timers, setImmediate, close callbacks)
+   - Will block here if no other work pending
+
+5. **Check Phase**
+   - Executes `setImmediate()` callbacks
+   - Runs after poll phase completes
+
+6. **Close Callbacks Phase**
+   - Executes close event callbacks (`socket.on('close')`)
+
+**Microtasks vs Macrotasks:**
+
+**Microtasks (higher priority):**
+
+- `Promise.then()`, `Promise.catch()`, `Promise.finally()`
+- `process.nextTick()` (highest priority, runs before other microtasks)
+- `queueMicrotask()`
+- Execute after current operation, **before** moving to next phase
+- Processed completely between each phase
+
+**Macrotasks (lower priority):**
+
+- `setTimeout()`, `setInterval()` (timers phase)
+- `setImmediate()` (check phase)
+- I/O operations (poll phase)
+- One macrotask per phase iteration
+
+**Execution Order Example:**
+
+```javascript
+console.log("1: Synchronous");
+
+setTimeout(() => console.log("2: setTimeout"), 0);
+
+Promise.resolve().then(() => console.log("3: Promise"));
+
+process.nextTick(() => console.log("4: nextTick"));
+
+console.log("5: Synchronous");
+
+// Output:
+// 1: Synchronous
+// 5: Synchronous
+// 4: nextTick (microtask - highest priority)
+// 3: Promise (microtask)
+// 2: setTimeout (macrotask)
+```
+
+**setImmediate vs setTimeout(0):**
+
+```javascript
+setTimeout(() => console.log("setTimeout"), 0);
+setImmediate(() => console.log("setImmediate"));
+
+// Order is non-deterministic (depends on system performance)
+// Inside I/O callback, setImmediate ALWAYS runs first:
+
+fs.readFile("file.txt", () => {
+  setTimeout(() => console.log("setTimeout"), 0);
+  setImmediate(() => console.log("setImmediate"));
+  // Output: setImmediate, setTimeout (guaranteed order)
+});
+```
+
+**Common Patterns:**
+
+**1. process.nextTick() for immediate execution:**
+
+```javascript
+// Runs before any I/O or timers
+process.nextTick(() => {
+  console.log("Runs first");
+});
+```
+
+**2. setImmediate() for deferring work:**
+
+```javascript
+// Useful for breaking up CPU-intensive work
+function processItems(items) {
+  items.forEach((item, i) => {
+    // Process item
+    if (i % 100 === 0) {
+      setImmediate(() => {}); // Give event loop a chance to process I/O
+    }
+  });
+}
+```
+
+**3. Avoiding blocking:**
+
+```javascript
+// BAD - blocks event loop
+const data = fs.readFileSync("large-file.txt");
+
+// GOOD - non-blocking
+fs.readFile("large-file.txt", (err, data) => {
+  // Callback runs when ready
+});
+```
+
+**Key Principles:**
+
+- **Single-threaded** â†’ Only one call stack
+- **Non-blocking** â†’ Async operations don't block the thread
+- **Concurrent** â†’ Multiple operations in progress (not parallel)
+- **Libuv thread pool** â†’ Handles file I/O, DNS, crypto (default 4 threads)
+
+**What blocks the event loop:**
+
+- Synchronous operations (loops, JSON.parse of huge data)
+- CPU-intensive calculations
+- Blocking I/O (fs.readFileSync)
+- Inefficient regex on large strings
+
+**Performance Tips:**
+
+1. Use async versions of file operations
+2. Break CPU-intensive work into chunks
+3. Use worker threads for CPU-bound tasks
+4. Avoid deep synchronous recursion
+5. Monitor event loop lag with metrics
+
+[↑ Back to Appendix](#appendix)
 
 ---
 
@@ -365,7 +505,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 - Promise.then (microtask)
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -381,7 +521,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - OAuth2 providers (Google, GitHub, etc.)
 - JWT-based or session-based authentication
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -394,13 +534,13 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Authorization framework
 - Uses access tokens
 - Involves an authorization server
-- OAuth2 ≠ authentication
+- OAuth2 â‰  authentication
 
 **Red flags:**
 
 - "OAuth is login"
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -427,7 +567,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 - Global exception filters
 - Centralized error handling
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -441,7 +581,7 @@ Middleware → Guards → Interceptors → Pipes → Controller → Interceptors
 
 Use the `extends` keyword to inherit properties from a parent interface.
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -451,8 +591,8 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **A:**
 
-- `useMemo` → memoizes a **value**
-- `useCallback` → memoizes a **function**
+- `useMemo` â†’ memoizes a **value**
+- `useCallback` â†’ memoizes a **function**
 - Both prevent unnecessary re-computations
 - Use when passing props to child components
 
@@ -461,7 +601,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Using them everywhere unnecessarily
 - Not understanding dependencies array
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -480,7 +620,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not cleaning up event listeners
 - Not canceling API requests
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -548,7 +688,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Breaking hooks rules inside custom hooks
 - Creating hooks that are too tightly coupled to specific components
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -573,7 +713,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not understanding the write trade-off
 - Indexing everything
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -587,7 +727,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Common in ORMs without proper eager loading
 - Solution: Use JOIN or eager loading
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -616,7 +756,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - "JWT is always better"
 - Storing sensitive data in JWT
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -635,7 +775,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not knowing what SQL injection is
 - String concatenation in queries
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -654,7 +794,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Can't explain in simple terms
 - Not understanding scope chain
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -681,7 +821,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Over-normalizing (too many JOINs)
 - Not understanding when to denormalize
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -711,7 +851,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not using foreign key constraints
 - Duplicating data across tables
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -733,16 +873,16 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Types:**
 
-- **Range partitioning** → by date ranges, numeric ranges
-- **List partitioning** → by specific values (country, status)
-- **Hash partitioning** → distribute evenly across partitions
+- **Range partitioning** â†’ by date ranges, numeric ranges
+- **List partitioning** â†’ by specific values (country, status)
+- **Hash partitioning** â†’ distribute evenly across partitions
 
 **Benefits:**
 
-- **Query performance** → scan only relevant partitions (partition pruning)
-- **Maintenance** → easier to archive/drop old partitions
-- **Bulk operations** → faster on specific partitions
-- **Index size** → smaller indexes per partition
+- **Query performance** â†’ scan only relevant partitions (partition pruning)
+- **Maintenance** â†’ easier to archive/drop old partitions
+- **Bulk operations** â†’ faster on specific partitions
+- **Index size** â†’ smaller indexes per partition
 
 **Trade-offs:**
 
@@ -758,7 +898,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not automating partition creation
 - Ignoring maintenance overhead
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -806,10 +946,10 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Real-world examples:**
 
-- **Banking** → CP (can't show wrong balance)
-- **Social media feeds** → AP (okay to show slightly old posts)
-- **Shopping cart** → AP (better to let user add items than show error)
-- **Inventory systems** → CP (prevent overselling)
+- **Banking** â†’ CP (can't show wrong balance)
+- **Social media feeds** â†’ AP (okay to show slightly old posts)
+- **Shopping cart** â†’ AP (better to let user add items than show error)
+- **Inventory systems** â†’ CP (prevent overselling)
 
 **Red flags:**
 
@@ -818,7 +958,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Choosing wrong trade-off for use case
 - Not knowing eventual consistency
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -840,7 +980,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Premature optimization
 - Not measuring before optimizing
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -857,7 +997,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Process:**
 
-1. State changes → new Virtual DOM created
+1. State changes â†’ new Virtual DOM created
 2. Diff with previous Virtual DOM
 3. Calculate minimal changes needed
 4. Update only changed parts in real DOM
@@ -867,7 +1007,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - "Virtual DOM is always faster" (not always true)
 - Not understanding reconciliation
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -879,9 +1019,9 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Context-dependent:**
 
-- **Method call**: `obj.method()` → this = obj
-- **Function call**: `func()` → this = undefined (strict) / window
-- **Constructor**: `new Func()` → this = new object
+- **Method call**: `obj.method()` â†’ this = obj
+- **Function call**: `func()` â†’ this = undefined (strict) / window
+- **Constructor**: `new Func()` â†’ this = new object
 - **Arrow functions**: inherit this from enclosing scope
 - **Explicit binding**: call(), apply(), bind()
 
@@ -890,7 +1030,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not understanding arrow functions don't bind this
 - Losing context when passing methods as callbacks
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -917,7 +1057,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not understanding dependency injection
 - Circular dependencies between modules
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -943,7 +1083,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not understanding injection scopes
 - Creating instances with 'new' instead of injection
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -966,7 +1106,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not testing migrations on staging
 - Missing rollback migrations
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -987,7 +1127,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Too many columns (diminishing returns)
 - Not understanding leftmost prefix rule
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1006,7 +1146,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Using 'any' when generics would work
 - Overly complex generic constraints
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1030,7 +1170,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Confusing union with intersection
 - Creating impossible intersections
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1057,7 +1197,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Unresolved conflict or bad outcome
 - Personal attacks or emotional responses
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1087,7 +1227,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - No learning or change in behavior
 - Repeating same type of mistakes
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1118,7 +1258,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - No concrete examples or changes
 - Making excuses
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1149,7 +1289,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Ignoring business constraints
 - Unable to explain reasoning
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1180,7 +1320,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Not checking for understanding
 - Taking over instead of guiding
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1200,7 +1340,7 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 3. **Inheritance**
    - Reuse behavior by extending a base class
-   - Models an “is-a” relationship
+   - Models an â€œis-aâ€ relationship
 
 4. **Polymorphism**
    - Same interface, different implementations
@@ -1213,10 +1353,10 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Red flags:**
 
-- “Inheritance is always better”
+- â€œInheritance is always betterâ€
 - Confusing abstraction with encapsulation
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1226,19 +1366,19 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **A:**
 
-1. **S — Single Responsibility Principle**
+1. **S â€” Single Responsibility Principle**
    - A class/module should have one reason to change
 
-2. **O — Open/Closed Principle**
+2. **O â€” Open/Closed Principle**
    - Open for extension, closed for modification
 
-3. **L — Liskov Substitution Principle**
+3. **L â€” Liskov Substitution Principle**
    - Subtypes must be substitutable for their base types
 
-4. **I — Interface Segregation Principle**
-   - Prefer small, specific interfaces over “fat” ones
+4. **I â€” Interface Segregation Principle**
+   - Prefer small, specific interfaces over â€œfatâ€ ones
 
-5. **D — Dependency Inversion Principle**
+5. **D â€” Dependency Inversion Principle**
    - Depend on abstractions, not concrete implementations
 
 **Example cues:**
@@ -1248,10 +1388,10 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Red flags:**
 
-- “SOLID means use inheritance everywhere”
+- â€œSOLID means use inheritance everywhereâ€
 - Changing base types breaks derived behavior (LSP violation)
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1285,10 +1425,10 @@ Use the `extends` keyword to inherit properties from a parent interface.
 
 **Red flags:**
 
-- Using abstract classes just to “share types”
+- Using abstract classes just to â€œshare typesâ€
 - Overusing inheritance for code reuse
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)
 
 ---
 
@@ -1306,11 +1446,11 @@ Use the `extends` keyword to inherit properties from a parent interface.
    - Use polymorphism to avoid `if/else` chains
    - Extend with new channel implementations
 
-3. **Refactoring a “God” service**
+3. **Refactoring a â€œGodâ€ service**
    - Split by responsibility (SRP)
    - Improve cohesion and testability
 
-4. **Swapping a data source (REST → GraphQL)**
+4. **Swapping a data source (REST â†’ GraphQL)**
    - Depend on abstractions (DIP)
    - Keep callers unchanged
 
@@ -1336,4 +1476,4 @@ Use the `extends` keyword to inherit properties from a parent interface.
 - Fragile inheritance trees
 - Widespread conditional logic on type
 
-[↑ Back to Appendix](#appendix)
+[â†‘ Back to Appendix](#appendix)

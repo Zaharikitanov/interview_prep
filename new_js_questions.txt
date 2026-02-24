@@ -1,0 +1,127 @@
+## Async/Await
+
+**Q:** What is async/await and how does it differ from Promises?
+
+**A:**
+
+**Definition:** Syntactic sugar over Promises that makes asynchronous code look synchronous.
+
+**Key Differences:**
+
+1. **Syntax**
+   - Promises: `.then()` chains
+   - Async/await: Sequential-looking code with `await`
+
+2. **Error Handling**
+   - Promises: `.catch()` or second argument to `.then()`
+   - Async/await: `try/catch` blocks (more familiar)
+
+3. **Readability**
+   - Async/await is generally more readable for complex flows
+   - Avoids callback nesting
+
+**Examples:**
+
+```javascript
+// With Promises
+fetchUser(id)
+  .then(user => fetchPosts(user.id))
+  .then(posts => fetchComments(posts[0].id))
+  .then(comments => console.log(comments))
+  .catch(error => console.error(error));
+
+// With Async/Await
+async function getData() {
+  try {
+    const user = await fetchUser(id);
+    const posts = await fetchPosts(user.id);
+    const comments = await fetchComments(posts[0].id);
+    console.log(comments);
+  } catch (error) {
+    console.error(error);
+  }
+}
+```
+
+**Parallel Execution:**
+
+```javascript
+// Sequential (slow) - waits for each
+const user = await fetchUser();
+const posts = await fetchPosts(); // waits for user
+
+// Parallel (fast) - runs simultaneously
+const [user, posts] = await Promise.all([
+  fetchUser(),
+  fetchPosts()
+]);
+
+// Or with Promise.allSettled for handling individual failures
+const results = await Promise.allSettled([
+  fetchUser(),
+  fetchPosts(),
+  fetchComments()
+]);
+```
+
+**Important Rules:**
+
+1. **`await` only works inside `async` functions**
+   - Top-level await available in modules (ES2022+)
+
+2. **`async` functions always return a Promise**
+   - Even if you return a non-Promise value
+
+3. **Error propagation**
+   - Unhandled errors in async functions become rejected promises
+
+**Common Patterns:**
+
+```javascript
+// 1. Conditional awaiting
+async function getUser(id, includeDetails = false) {
+  const user = await fetchUser(id);
+  if (includeDetails) {
+    user.details = await fetchDetails(id);
+  }
+  return user;
+}
+
+// 2. Loop with await (sequential)
+for (const id of userIds) {
+  await processUser(id); // processes one at a time
+}
+
+// 3. Loop with parallel execution
+await Promise.all(userIds.map(id => processUser(id)));
+
+// 4. Early return on error
+async function validateAndSave(data) {
+  if (!data.email) return { error: 'Email required' };
+  
+  try {
+    const result = await saveToDatabase(data);
+    return { success: true, result };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+```
+
+**When to use Promises directly:**
+
+- Building libraries or utilities
+- When you need fine-grained control
+- Promise.race(), Promise.any() scenarios
+- Avoiding try/catch blocks for simple cases
+
+**Red flags:**
+
+- Using await in loops without understanding sequential vs parallel
+- Not handling errors with try/catch
+- Forgetting that async functions return Promises
+- Not using Promise.all for independent operations
+
+[â†' Back to Appendix](#appendix)
+
+---

@@ -2,19 +2,30 @@
 
 ## Overview
 
-Build **Energy Management Dashboard** in React that resembles the design shown in `dashboard.jpg`. The mock data is provided in `mockData.js`.
+Build a responsive **Energy Management Dashboard** in React that resembles the design shown in `dashboard.JPG`. The mock data is provided in `src/mockData.js`.
 
 ---
 
 ## Design Reference
 
-![Dashboard](dashboard.jpg)
+![Dashboard](dashboard.JPG)
 
 ---
 
 ## Getting Started
 
-Use any React setup you're comfortable with (Vite, Create React App, Next.js, etc.). No specific UI library is required — you may use one or build custom components.
+The React app is pre-scaffolded with Vite. Just install dependencies and start:
+
+```bash
+npm install
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`.
+
+`mockData.js` is already in `src/` — no setup needed.
+
+No specific UI library is required — you may use one or build custom components.
 
 ---
 
@@ -96,13 +107,12 @@ Implement the following one-click toggle filters (multiple can be active simulta
 
 - Source code (zip or Git repo link)
 - Brief note on any decisions or trade-offs you made
-- Instructions to run locally (`npm install` / `npm run dev` or equivalent)
 
 ---
 
 ## Data Reference
 
-All mock data is exported from `mockData.js`:
+All mock data is exported from `src/mockData.js`:
 
 ```js
 import {
